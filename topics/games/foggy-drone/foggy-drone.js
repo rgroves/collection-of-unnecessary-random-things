@@ -1,7 +1,7 @@
 /** 
  * Simulated "Drone" with Fog-Peeking Hole Detection and Lasing Capabilities For Foggy Golfers.
  *
- * [Verified working for Foggy Golf Beta v0.6.2]
+ * [Verified working for Foggy Golf Beta v0.7.0]
  *
  * Copy & Paste this into your DevTools Console Window (😅 "What, me worry?")
  *
@@ -15,8 +15,8 @@
  * Happy Golfing!
 **/
 await(async () => {
-  // Known working for FOGGY.Golf Beta v0.6.2
-  const EXPECTED_VERSION = "Beta 0.6.2";
+  // Known working for FOGGY.Golf Beta v0.7.0
+  const EXPECTED_VERSION = "Beta 0.7.0";
 
   let courseRows = 0;
   let courseCols = 0;
