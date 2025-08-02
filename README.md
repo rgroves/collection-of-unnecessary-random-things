@@ -7,3 +7,4 @@ As of the exact moment you are reading this, (barring any instances of me forget
 ## Index
 
 - [FoggyDrone](topics/games/foggy-drone/README.md) - If you play [FOGGY.Golf](https://foggy.golf/) and want a slight technical edge, check this out (while it still works).
+- [Index Misdirect](topics/mischievous/index-misdirect/README.md) - That's just a boring index page. Ooh, a `.secret_keys` folder! I should check that out.
