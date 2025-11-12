@@ -1,7 +1,7 @@
 /** 
  * Simulated "Drone" with Fog-Peeking Hole Detection and Lasing Capabilities For Foggy Golfers.
  *
- * [Verified working for Foggy Golf Beta v0.8.1]
+ * [Verified working for Foggy Golf Beta v1.0.0]
  *
  * Copy & Paste this into your DevTools Console Window (😅 "What, me worry?")
  *
@@ -14,12 +14,15 @@
  *
  * Happy Golfing!
 **/
-await(async () => {
-  // Known working for FOGGY.Golf Beta v0.8.1
-  const EXPECTED_VERSION = "Beta 0.8.1";
+const DEBUG = false;
+function dbg() { if (DEBUG) console.log(...arguments) };
 
-  let courseRows = 0;
-  let courseCols = 0;
+await(async () => {
+  // Known working for FOGGY.Golf v1.0.0
+  const EXPECTED_VERSION = "1.0.0";
+
+  let courseRows = 8;
+  let courseCols = 8;
   let holeCoordinates = null;
   let scanClear = null;
   let droneDeployCount = 0;
@@ -44,11 +47,11 @@ await(async () => {
       const hParent = heading.parentElement;
       const firstParagraph = hParent.querySelector("p");
       if (firstParagraph && firstParagraph.innerText) {
-        const versionMatch = firstParagraph.innerText.match(/([a-zA-Z]+)\s*(\d+\.\d+\.\d+).*/);
+        const versionMatch = firstParagraph.innerText.match(/([a-zA-Z]+)?\s*(\d+\.\d+\.\d+).*/);
         foundVersion = versionMatch && versionMatch[0] ? versionMatch[0] : foundVersion;
       }
     }
-
+    dbg({ foundVersion });
     return foundVersion === EXPECTED_VERSION
   }
 
@@ -79,13 +82,15 @@ await(async () => {
     ).format();
 
     const todaysCoursePattern = new RegExp(`"${USEastDateNow}"\s*:\s*([^}]+})`);
-    const courseArrayPattern = /\[(\[(['"][a-z]['"],?\s*)+\],?\s*)+\]/;
+    const courseArrayPattern = /map\s*:\s*['"]([a-z]+)['"]/;
     const importPattern = /import\s*.*?"(.\/[^"]+)/ig;
     let todaysCoursePatternMatch = null;
 
     // Safety trigger limit to prevent greedy or infinite looping. Limits the number of target source files to inspect.
     const SAFETY_TRIGGER_LIMIT = 5;
     const componentUrls = componentUrl ? [componentUrl] : [];
+
+    dbg(">>> componentUrls:", JSON.stringify(componentUrls, null, 2));
 
     // Search through sources for today's course pattern; stop when found or if we hit the defined safety limit.
     for (
@@ -122,17 +127,16 @@ await(async () => {
       return;
     };
 
-    const courseArrayJson = courseArrayPattern.exec(todaysCoursePatternMatch[1]);
-    let course;
+    const courseArrayJson = courseArrayPattern.exec(todaysCoursePatternMatch[1]) ?? [];
+    dbg(">>>", todaysCoursePatternMatch);
+    dbg(">>>", courseArrayJson);
 
-    try {
-      course = JSON.parse(courseArrayJson[0]);
-    } catch {
-      course = []
+    let course = courseArrayJson[1] ?? [];
+    dbg(">>> course", course);
+
+    if (!course) {
+      throw new Error("FoggyDrone: Could not find course; Fog thicker than molasses!");
     }
-
-    courseRows = course.length;
-    courseCols = course[0].length;
 
     for (let row = 0; row < courseRows; row++) {
       if (holeCoordinates) {
@@ -140,13 +144,13 @@ await(async () => {
       };
 
       for (let col = 0; col < courseCols; col++) {
-        if (course[row][col] === 'h') {
+        if (course[row * courseCols + col] === 'h') {
           holeCoordinates = { x: col, y: row };
           break;
         }
       }
     }
-
+    dbg(">>> holeCoordinates", holeCoordinates);
     if (!holeCoordinates) {
       throw new Error("FoggyDrone: Could not find hole; Fog too thick.");
     }
@@ -229,7 +233,7 @@ await(async () => {
       ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
 
       hintCoordinates.forEach(([x, y]) => {
-        ctx.fillStyle = `rgba(0, 128, 0, ${colorAlpha})`;
+        ctx.fillStyle = `rgba(128, 0, 0, ${colorAlpha})`;
         ctx.fillRect(x * cellWidth, y * cellHeight, cellWidth, cellHeight);
       });
 
